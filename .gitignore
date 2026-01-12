@@ -34,6 +34,13 @@ Thumbs.db
 
 # Testing
 coverage/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ADW (AI Developer Workflow)
+adws/venv/
+agents/
 
 # Misc
 *.local

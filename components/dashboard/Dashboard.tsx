@@ -1,51 +1,34 @@
 import { useAuth } from '../../contexts/AuthContext';
-import { Card } from '../ui/card';
+import { ManagerDashboard } from './ManagerDashboard';
+import { CoachDashboard } from './CoachDashboard';
+import { CoupleDashboard } from './CoupleDashboard';
+import { LoadingPage } from '../ui/loading-spinner';
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user, role, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingPage message="Loading dashboard..." />;
+  }
+
+  const displayName = user?.email?.split('@')[0] || 'User';
 
   return (
     <div className="container mx-auto p-6">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Marriage Ministry Dashboard</h1>
+        <h1 className="text-3xl font-bold text-foreground">
+          {role === 'admin' && 'Ministry Dashboard'}
+          {role === 'coach' && 'Coach Dashboard'}
+          {role === 'couple' && 'My Dashboard'}
+        </h1>
         <p className="text-muted-foreground mt-2">
-          Welcome back{user?.email ? `, ${user.email}` : ''}
+          Welcome back{displayName ? `, ${displayName}` : ''}
         </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <h3 className="text-sm font-medium text-muted-foreground">Total Coaches</h3>
-          <p className="text-3xl font-bold mt-2">--</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-sm font-medium text-muted-foreground">Active Couples</h3>
-          <p className="text-3xl font-bold mt-2">--</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-sm font-medium text-muted-foreground">Pending Assignments</h3>
-          <p className="text-3xl font-bold mt-2">--</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-sm font-medium text-muted-foreground">Completed This Week</h3>
-          <p className="text-3xl font-bold mt-2">--</p>
-        </Card>
-      </div>
-
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-          <p className="text-muted-foreground">No recent activity</p>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Upcoming Assignments</h2>
-          <p className="text-muted-foreground">No upcoming assignments</p>
-        </Card>
-      </div>
+      {role === 'admin' && <ManagerDashboard />}
+      {role === 'coach' && <CoachDashboard />}
+      {role === 'couple' && <CoupleDashboard />}
     </div>
   );
 }

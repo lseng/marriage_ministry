@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 IssueClassSlashCommand = Literal["/chore", "/bug", "/feature"]
 
 # All slash commands used in the ADW system
-# Includes issue classification commands and ADW-specific commands
+# Includes issue classification commands, ADW-specific commands, and development commands
 SlashCommand = Literal[
     # Issue classification commands
     "/chore",
@@ -22,6 +22,21 @@ SlashCommand = Literal[
     "/commit",
     "/pull_request",
     "/implement",
+    # Testing commands
+    "/test",
+    "/e2e_test",
+    "/run_tests",
+    "/validate",
+    "/review",
+    # Supabase commands
+    "/migration",
+    "/edge_function",
+    "/rls_policy",
+    # Development commands
+    "/component",
+    "/hook",
+    "/prd",
+    "/design_audit",
 ]
 
 
@@ -106,7 +121,7 @@ class AgentPromptRequest(BaseModel):
     prompt: str
     adw_id: str
     agent_name: str = "ops"
-    model: Literal["sonnet", "opus"] = "opus"
+    model: Literal["sonnet", "opus", "haiku"] = "opus"
     dangerously_skip_permissions: bool = False
     output_file: str
 
@@ -126,7 +141,7 @@ class AgentTemplateRequest(BaseModel):
     slash_command: SlashCommand
     args: List[str]
     adw_id: str
-    model: Literal["sonnet", "opus"] = "sonnet"
+    model: Literal["sonnet", "opus", "haiku"] = "sonnet"
 
 
 class ClaudeCodeResultMessage(BaseModel):

@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,7 +56,7 @@ serve(async (req) => {
   }
 });
 
-async function handleCoaches(req: Request, supabase: any) {
+async function handleCoaches(req: Request, supabase: SupabaseClient) {
   const method = req.method;
 
   if (method === 'GET') {
@@ -78,7 +78,7 @@ async function handleCoaches(req: Request, supabase: any) {
   });
 }
 
-async function handleCouples(req: Request, supabase: any) {
+async function handleCouples(req: Request, supabase: SupabaseClient) {
   const method = req.method;
 
   if (method === 'GET') {
@@ -100,7 +100,7 @@ async function handleCouples(req: Request, supabase: any) {
   });
 }
 
-async function handleAssignments(req: Request, supabase: any) {
+async function handleAssignments(req: Request, supabase: SupabaseClient) {
   const method = req.method;
 
   if (method === 'GET') {
