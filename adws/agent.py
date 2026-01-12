@@ -7,6 +7,7 @@ import os
 import json
 import re
 from typing import Optional, List, Dict, Any, Tuple
+from pathlib import Path
 from dotenv import load_dotenv
 from data_types import (
     AgentPromptRequest,
@@ -15,8 +16,9 @@ from data_types import (
     ClaudeCodeResultMessage,
 )
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from parent directory's .env.local
+_env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(_env_path)
 
 # Get Claude Code CLI path from environment
 CLAUDE_PATH = os.getenv("CLAUDE_CODE_PATH", "claude")

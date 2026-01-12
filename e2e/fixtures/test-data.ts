@@ -7,13 +7,13 @@
 export const testUsers = {
   admin: {
     email: 'admin@test.com',
-    password: 'testpassword123',
+    password: 'password123',
     firstName: 'Admin',
     lastName: 'User',
   },
   coach: {
     email: 'coach@test.com',
-    password: 'testpassword123',
+    password: 'password123',
     firstName: 'Test',
     lastName: 'Coach',
   },
