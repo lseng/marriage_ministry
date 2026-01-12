@@ -41,6 +41,20 @@ CREATE INDEX IF NOT EXISTS idx_homework_responses_assignment_status_id ON public
 CREATE INDEX IF NOT EXISTS idx_homework_responses_reviewed_at ON public.homework_responses(reviewed_at);
 CREATE INDEX IF NOT EXISTS idx_assignments_form_template_id ON public.assignments(form_template_id);
 
+-- Add user_id to couples for RLS (if not exists) - MUST BE DONE BEFORE RLS POLICIES
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'couples' AND column_name = 'user_id'
+    ) THEN
+        ALTER TABLE public.couples ADD COLUMN user_id UUID REFERENCES public.profiles(id);
+    END IF;
+END $$;
+
+-- Create index for couples.user_id
+CREATE INDEX IF NOT EXISTS idx_couples_user_id ON public.couples(user_id);
+
 -- Enable RLS
 ALTER TABLE public.form_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.homework_responses ENABLE ROW LEVEL SECURITY;
@@ -133,20 +147,6 @@ CREATE TRIGGER update_form_templates_updated_at BEFORE UPDATE ON public.form_tem
 
 CREATE TRIGGER update_homework_responses_updated_at BEFORE UPDATE ON public.homework_responses
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Add user_id to couples for RLS (if not exists)
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'couples' AND column_name = 'user_id'
-    ) THEN
-        ALTER TABLE public.couples ADD COLUMN user_id UUID REFERENCES public.profiles(id);
-    END IF;
-END $$;
-
--- Create index for couples.user_id
-CREATE INDEX IF NOT EXISTS idx_couples_user_id ON public.couples(user_id);
 
 -- Comments for documentation
 COMMENT ON TABLE public.form_templates IS 'Dynamic form templates for homework assignments';
