@@ -28,12 +28,17 @@ import sys
 import os
 import logging
 from typing import Tuple, Optional, Union
+from pathlib import Path
 
 try:
     from dotenv import load_dotenv
 except ImportError:
-    def load_dotenv():
+    def load_dotenv(*args, **kwargs):
         pass
+
+# Load .env.local from parent directory
+_env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(_env_path)
 
 from data_types import (
     AgentTemplateRequest,
@@ -350,9 +355,6 @@ def check_error(
 
 def main():
     """Main entry point."""
-    # Load environment variables
-    load_dotenv()
-
     # Parse arguments (before we have logger)
     issue_number, adw_id = parse_args()
 
