@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Check, Trash2, X } from 'lucide-react';
+import { Bell, Check, Trash2, X, Loader2 } from 'lucide-react';
 import { useNotifications, Notification } from '../../contexts/NotificationContext';
 import { formatDistanceToNow } from '../../lib/date';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { getCategoryIcon } from '../../services/notifications';
 
 export function NotificationBell() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead, clearAll } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -31,19 +32,12 @@ export function NotificationBell() {
     }
   };
 
-  const getNotificationIcon = (type: Notification['type']) => {
-    switch (type) {
-      case 'assignment':
-        return '📋';
-      case 'homework':
-        return '📝';
-      case 'coach_assignment':
-        return '👥';
-      case 'review':
-        return '✅';
-      default:
-        return '🔔';
+  const getNotificationIcon = (notification: Notification) => {
+    // Use the icon from the notification if available, otherwise derive from type
+    if (notification.icon) {
+      return notification.icon;
     }
+    return getCategoryIcon(notification.category || notification.type);
   };
 
   return (
@@ -96,7 +90,12 @@ export function NotificationBell() {
 
           {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {isLoading ? (
+              <div className="py-8 text-center text-muted-foreground">
+                <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin opacity-50" />
+                <p className="text-sm">Loading notifications...</p>
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
                 <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No notifications yet</p>
@@ -114,7 +113,7 @@ export function NotificationBell() {
                     >
                       <div className="flex items-start gap-3">
                         <span className="text-lg shrink-0">
-                          {getNotificationIcon(notification.type)}
+                          {getNotificationIcon(notification)}
                         </span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">

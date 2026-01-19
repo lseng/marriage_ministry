@@ -246,21 +246,21 @@ npm run build   → Success (532 kB bundle)
   - Validation: Lint, build, and all 155 tests pass
 
 #### M2: Enhance In-App Notifications with Database Persistence
-- [ ] Wire up notification bell with database-backed notifications
+- [x] Wire up notification bell with database-backed notifications ✅ (2026-01-18)
   - Files:
-    - `services/notifications.ts` (new)
-    - `hooks/useNotifications.ts` (enhance existing)
-    - `components/ui/notification-bell.tsx` (enhance)
-    - `components/notifications/NotificationDropdown.tsx` (new)
-    - `contexts/NotificationContext.tsx` (enhance)
+    - `services/notifications.ts` (new) - CRUD operations for notifications table
+    - `components/ui/notification-bell.tsx` (enhanced) - Added loading state, uses service
+    - `contexts/NotificationContext.tsx` (enhanced) - Database persistence, real-time sync
+    - `services/__tests__/notifications.test.ts` (new) - Unit tests for service
   - Spec: `specs/phase-7-notifications.md`
-  - Work:
-    - Create notifications service (getNotifications, markAsRead, markAllAsRead)
-    - Enhance useNotifications hook to read from database
-    - Keep real-time subscription for immediate updates
-    - Create dropdown showing recent notifications with timestamps
-    - Mark as read on click
-  - Validation: Notifications persist across sessions, mark as read works
+  - Work completed:
+    - Created notifications service with getNotifications, getUnreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, createNotification, getNotificationPreferences, updateNotificationPreferences
+    - Enhanced NotificationContext to fetch from database on load, sync with database for all operations
+    - Added real-time subscription to notifications table for INSERT/UPDATE/DELETE events
+    - Added loading state to NotificationBell with spinner
+    - Added getCategoryIcon helper for consistent icon mapping
+    - Created comprehensive unit tests (23 tests covering all service functions)
+  - Validation: Lint (0 warnings), build (success), all 176 tests pass
 
 #### M3: Add Notification Preferences Page
 - [ ] Build notification settings in user profile
