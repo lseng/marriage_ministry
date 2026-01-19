@@ -180,7 +180,7 @@ npm run build   → Success (532 kB bundle)
   - Validation: Admin can create invitation, record appears in DB
 
 #### H4: Create Accept Invitation Page
-- [ ] Build invitation acceptance flow
+- [x] Build invitation acceptance flow ✅ (2026-01-18)
   - Files:
     - `components/auth/AcceptInvitePage.tsx` (new)
     - `App.tsx` (add route `/auth/accept-invite`)

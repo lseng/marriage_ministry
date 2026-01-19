@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ToastProvider } from './components/ui/toast';
 import { LoginPage } from './components/auth/LoginPage';
+import { AcceptInvitePage } from './components/auth/AcceptInvitePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './components/dashboard/Dashboard';
@@ -12,6 +13,9 @@ import { AssignmentsList } from './components/assignments/AssignmentsList';
 import { HomeworkPage } from './components/homework/HomeworkPage';
 import { ReviewsPage } from './components/homework/ReviewsPage';
 import { FormBuilderPage } from './components/homework/FormBuilderPage';
+import { CoachProfile } from './components/profile/CoachProfile';
+import { CoupleProfile } from './components/profile/CoupleProfile';
+import { MyProfile } from './components/profile/MyProfile';
 import './styles/globals.css';
 
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +34,7 @@ function App() {
           <BrowserRouter>
             <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/accept-invite" element={<AcceptInvitePage />} />
           <Route
             path="/"
             element={
@@ -94,6 +99,34 @@ function App() {
                   <FormBuilderPage />
                 </AppLayout>
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/coaches/:id"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AppLayout>
+                  <CoachProfile />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/couples/:id"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'coach']}>
+                <AppLayout>
+                  <CoupleProfile />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <AuthenticatedLayout>
+                <MyProfile />
+              </AuthenticatedLayout>
             }
           />
             </Routes>
