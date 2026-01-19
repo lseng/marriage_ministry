@@ -1,18 +1,24 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth, AccountLockedError, LoginFailedError } from '../../contexts/AuthContext';
 import { Button } from '../ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
-import { Heart } from 'lucide-react';
+import { Heart, AlertTriangle } from 'lucide-react';
 
 type AuthMode = 'password' | 'magic-link';
+type ErrorType = 'locked' | 'warning' | 'error';
+
+interface LoginError {
+  message: string;
+  type: ErrorType;
+}
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authMode, setAuthMode] = useState<AuthMode>('password');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<LoginError | null>(null);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   const { signIn, signInWithMagicLink } = useAuth();
@@ -32,7 +38,18 @@ export function LoginPage() {
         setMagicLinkSent(true);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      if (err instanceof AccountLockedError) {
+        setError({ message: err.message, type: 'locked' });
+      } else if (err instanceof LoginFailedError) {
+        // Show warning if only 1-2 attempts remaining
+        const type = err.remainingAttempts <= 2 ? 'warning' : 'error';
+        setError({ message: err.message, type });
+      } else {
+        setError({
+          message: err instanceof Error ? err.message : 'An error occurred',
+          type: 'error',
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -83,8 +100,19 @@ export function LoginPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
+              <div
+                className={`rounded-md p-3 text-sm flex items-start gap-2 ${
+                  error.type === 'locked'
+                    ? 'bg-destructive/20 text-destructive border border-destructive/30'
+                    : error.type === 'warning'
+                    ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-500/30'
+                    : 'bg-destructive/10 text-destructive'
+                }`}
+              >
+                {(error.type === 'locked' || error.type === 'warning') && (
+                  <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                )}
+                <span>{error.message}</span>
               </div>
             )}
 

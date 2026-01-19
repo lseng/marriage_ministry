@@ -211,7 +211,7 @@ npm run build   → Success (532 kB bundle)
   - Validation: Complete password reset flow works end-to-end
 
 #### H6: Add Account Lockout Logic
-- [ ] Implement failed login tracking and temporary lockout
+- [x] Implement failed login tracking and temporary lockout ✅ (2026-01-18)
   - Files:
     - `supabase/migrations/YYYYMMDD_profile_security_fields.sql`
     - `contexts/AuthContext.tsx`

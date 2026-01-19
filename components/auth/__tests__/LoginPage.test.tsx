@@ -18,6 +18,7 @@ vi.mock('../../../lib/supabase', () => ({
       signOut: vi.fn(),
     },
     from: vi.fn(),
+    rpc: vi.fn(),
   },
 }));
 
@@ -97,6 +98,23 @@ describe('LoginPage', () => {
           }),
         }),
       }),
+    });
+
+    // Mock RPC calls for account lockout
+    (supabase.rpc as ReturnType<typeof vi.fn>).mockImplementation((funcName: string) => {
+      if (funcName === 'get_lockout_status') {
+        return Promise.resolve({
+          data: [{ is_locked: false, locked_until: null, failed_attempts: 0, remaining_attempts: 5 }],
+          error: null,
+        });
+      }
+      if (funcName === 'record_failed_login') {
+        return Promise.resolve({ data: 4, error: null }); // 4 attempts remaining
+      }
+      if (funcName === 'clear_failed_logins') {
+        return Promise.resolve({ data: null, error: null });
+      }
+      return Promise.resolve({ data: null, error: null });
     });
   });
 
@@ -212,11 +230,10 @@ describe('LoginPage', () => {
 
     it('should display error message on failed sign in', async () => {
       const user = userEvent.setup();
-      const errorMessage = 'Invalid login credentials';
 
       (supabase.auth.signInWithPassword as ReturnType<typeof vi.fn>).mockResolvedValue({
         data: { user: null, session: null },
-        error: new Error(errorMessage),
+        error: new Error('Invalid login credentials'),
       });
 
       renderLoginPage();
@@ -234,7 +251,8 @@ describe('LoginPage', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        // Error message now includes remaining attempts
+        expect(screen.getByText(/Invalid login credentials/)).toBeInTheDocument();
       });
 
       expect(mockNavigate).not.toHaveBeenCalled();
@@ -283,7 +301,7 @@ describe('LoginPage', () => {
       });
     });
 
-    it('should handle non-Error thrown values', async () => {
+    it('should handle Supabase error objects with message', async () => {
       const user = userEvent.setup();
 
       (supabase.auth.signInWithPassword as ReturnType<typeof vi.fn>).mockResolvedValue({
@@ -306,7 +324,8 @@ describe('LoginPage', () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('An error occurred')).toBeInTheDocument();
+        // Error message from Supabase error object with remaining attempts
+        expect(screen.getByText(/Some error object/)).toBeInTheDocument();
       });
     });
   });
@@ -489,11 +508,12 @@ describe('LoginPage', () => {
       await user.click(screen.getByRole('button', { name: /^sign in$/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+        // Error message now includes remaining attempts info
+        expect(screen.getByText(/Invalid credentials/)).toBeInTheDocument();
       });
 
       // Error should persist until next submit attempt
-      expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+      expect(screen.getByText(/Invalid credentials/)).toBeInTheDocument();
     });
 
     it('should clear error on new authentication attempt', async () => {
@@ -519,7 +539,8 @@ describe('LoginPage', () => {
       await user.click(screen.getByRole('button', { name: /^sign in$/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+        // Error message now includes remaining attempts info
+        expect(screen.getByText(/Invalid credentials/)).toBeInTheDocument();
       });
 
       // Second attempt succeeds
@@ -543,7 +564,7 @@ describe('LoginPage', () => {
 
       // Error should be cleared before new attempt
       await waitFor(() => {
-        expect(screen.queryByText('Invalid credentials')).not.toBeInTheDocument();
+        expect(screen.queryByText(/Invalid credentials/)).not.toBeInTheDocument();
       });
     });
   });

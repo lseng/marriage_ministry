@@ -16,6 +16,8 @@ export interface Database {
           id: string
           email: string
           role: UserRole
+          failed_login_attempts: number
+          locked_until: string | null
           created_at: string
           updated_at: string
         }
@@ -23,6 +25,8 @@ export interface Database {
           id: string
           email: string
           role: UserRole
+          failed_login_attempts?: number
+          locked_until?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -30,6 +34,8 @@ export interface Database {
           id?: string
           email?: string
           role?: UserRole
+          failed_login_attempts?: number
+          locked_until?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -357,3 +363,11 @@ export type HomeworkResponseRow = Database['public']['Tables']['homework_respons
 export type Invitation = Database['public']['Tables']['invitations']['Row'];
 export type InvitationInsert = Database['public']['Tables']['invitations']['Insert'];
 export type InvitationUpdate = Database['public']['Tables']['invitations']['Update'];
+
+// Account lockout types
+export interface LockoutStatus {
+  is_locked: boolean;
+  locked_until: string | null;
+  failed_attempts: number;
+  remaining_attempts: number;
+}

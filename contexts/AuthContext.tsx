@@ -1,8 +1,36 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import type { UserRole, Profile } from '../types/database';
+import type { UserRole, Profile, LockoutStatus } from '../types/database';
 import { getPermissions, type Permission } from '../lib/permissions';
+
+// Custom error for account lockout
+export class AccountLockedError extends Error {
+  public lockedUntil: Date;
+  public remainingMinutes: number;
+
+  constructor(lockedUntil: Date) {
+    const remainingMinutes = Math.ceil((lockedUntil.getTime() - Date.now()) / 60000);
+    super(`Account is locked. Try again in ${remainingMinutes} minute${remainingMinutes === 1 ? '' : 's'}.`);
+    this.name = 'AccountLockedError';
+    this.lockedUntil = lockedUntil;
+    this.remainingMinutes = remainingMinutes;
+  }
+}
+
+// Custom error for failed login with remaining attempts
+export class LoginFailedError extends Error {
+  public remainingAttempts: number;
+
+  constructor(message: string, remainingAttempts: number) {
+    const warningMessage = remainingAttempts > 0
+      ? `${message} ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining before lockout.`
+      : message;
+    super(warningMessage);
+    this.name = 'LoginFailedError';
+    this.remainingAttempts = remainingAttempts;
+  }
+}
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +45,29 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper functions for account lockout
+async function getLockoutStatus(email: string): Promise<LockoutStatus | null> {
+  const { data, error } = await supabase.rpc('get_lockout_status', { user_email: email });
+  if (error || !data || data.length === 0) return null;
+  return data[0] as LockoutStatus;
+}
+
+async function recordFailedLogin(email: string): Promise<number> {
+  const { data, error } = await supabase.rpc('record_failed_login', { user_email: email });
+  if (error) {
+    console.error('Error recording failed login:', error);
+    return 5; // Default to max attempts if error
+  }
+  return data as number;
+}
+
+async function clearFailedLogins(email: string): Promise<void> {
+  const { error } = await supabase.rpc('clear_failed_logins', { user_email: email });
+  if (error) {
+    console.error('Error clearing failed logins:', error);
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -80,8 +131,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
+    // Check if account is locked before attempting login
+    const lockoutStatus = await getLockoutStatus(email);
+    if (lockoutStatus?.is_locked && lockoutStatus.locked_until) {
+      throw new AccountLockedError(new Date(lockoutStatus.locked_until));
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+
+    if (error) {
+      // Record failed login attempt
+      const remainingAttempts = await recordFailedLogin(email);
+
+      if (remainingAttempts <= 0) {
+        // Account just got locked
+        const newLockoutStatus = await getLockoutStatus(email);
+        if (newLockoutStatus?.locked_until) {
+          throw new AccountLockedError(new Date(newLockoutStatus.locked_until));
+        }
+      }
+
+      // Include remaining attempts in error message
+      throw new LoginFailedError(error.message, Math.max(0, remainingAttempts));
+    }
+
+    // Clear failed login attempts on successful login
+    await clearFailedLogins(email);
   };
 
   const signInWithMagicLink = async (email: string) => {
