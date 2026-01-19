@@ -18,6 +18,7 @@ export interface Database {
           role: UserRole
           failed_login_attempts: number
           locked_until: string | null
+          notification_preferences: Json
           created_at: string
           updated_at: string
         }
@@ -27,6 +28,7 @@ export interface Database {
           role: UserRole
           failed_login_attempts?: number
           locked_until?: string | null
+          notification_preferences?: Json
           created_at?: string
           updated_at?: string
         }
@@ -36,6 +38,7 @@ export interface Database {
           role?: UserRole
           failed_login_attempts?: number
           locked_until?: string | null
+          notification_preferences?: Json
           created_at?: string
           updated_at?: string
         }
@@ -338,6 +341,179 @@ export interface Database {
           created_at?: string
         }
       }
+      notification_templates: {
+        Row: {
+          id: string
+          name: string
+          event_type: string
+          subject_template: string | null
+          email_body_template: string | null
+          sms_template: string | null
+          in_app_template: string | null
+          in_app_action_url: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          event_type: string
+          subject_template?: string | null
+          email_body_template?: string | null
+          sms_template?: string | null
+          in_app_template?: string | null
+          in_app_action_url?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          event_type?: string
+          subject_template?: string | null
+          email_body_template?: string | null
+          sms_template?: string | null
+          in_app_template?: string | null
+          in_app_action_url?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      notification_queue: {
+        Row: {
+          id: string
+          template_id: string | null
+          recipient_id: string
+          recipient_email: string | null
+          recipient_phone: string | null
+          channel: 'email' | 'sms' | 'in_app' | 'push'
+          variables: Json
+          priority: number
+          status: 'pending' | 'processing' | 'sent' | 'delivered' | 'failed' | 'cancelled'
+          scheduled_for: string
+          attempts: number
+          max_attempts: number
+          last_attempt_at: string | null
+          sent_at: string | null
+          delivered_at: string | null
+          error_message: string | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          template_id?: string | null
+          recipient_id: string
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          channel: 'email' | 'sms' | 'in_app' | 'push'
+          variables?: Json
+          priority?: number
+          status?: 'pending' | 'processing' | 'sent' | 'delivered' | 'failed' | 'cancelled'
+          scheduled_for?: string
+          attempts?: number
+          max_attempts?: number
+          last_attempt_at?: string | null
+          sent_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          template_id?: string | null
+          recipient_id?: string
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          channel?: 'email' | 'sms' | 'in_app' | 'push'
+          variables?: Json
+          priority?: number
+          status?: 'pending' | 'processing' | 'sent' | 'delivered' | 'failed' | 'cancelled'
+          scheduled_for?: string
+          attempts?: number
+          max_attempts?: number
+          last_attempt_at?: string | null
+          sent_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          recipient_id: string
+          title: string
+          body: string
+          action_url: string | null
+          icon: string | null
+          category: string | null
+          is_read: boolean
+          read_at: string | null
+          related_entity_type: string | null
+          related_entity_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipient_id: string
+          title: string
+          body: string
+          action_url?: string | null
+          icon?: string | null
+          category?: string | null
+          is_read?: boolean
+          read_at?: string | null
+          related_entity_type?: string | null
+          related_entity_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          recipient_id?: string
+          title?: string
+          body?: string
+          action_url?: string | null
+          icon?: string | null
+          category?: string | null
+          is_read?: boolean
+          read_at?: string | null
+          related_entity_type?: string | null
+          related_entity_id?: string | null
+          created_at?: string
+        }
+      }
+      notification_delivery_log: {
+        Row: {
+          id: string
+          notification_queue_id: string | null
+          event: 'queued' | 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounced' | 'failed'
+          channel: string
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          notification_queue_id?: string | null
+          event: 'queued' | 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounced' | 'failed'
+          channel: string
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          notification_queue_id?: string | null
+          event?: 'queued' | 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounced' | 'failed'
+          channel?: string
+          metadata?: Json
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -371,3 +547,45 @@ export interface LockoutStatus {
   failed_attempts: number;
   remaining_attempts: number;
 }
+
+// Notification types
+export type NotificationTemplate = Database['public']['Tables']['notification_templates']['Row'];
+export type NotificationTemplateInsert = Database['public']['Tables']['notification_templates']['Insert'];
+export type NotificationTemplateUpdate = Database['public']['Tables']['notification_templates']['Update'];
+
+export type NotificationQueueRow = Database['public']['Tables']['notification_queue']['Row'];
+export type NotificationQueueInsert = Database['public']['Tables']['notification_queue']['Insert'];
+export type NotificationQueueUpdate = Database['public']['Tables']['notification_queue']['Update'];
+
+export type Notification = Database['public']['Tables']['notifications']['Row'];
+export type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
+export type NotificationUpdate = Database['public']['Tables']['notifications']['Update'];
+
+export type NotificationDeliveryLog = Database['public']['Tables']['notification_delivery_log']['Row'];
+export type NotificationDeliveryLogInsert = Database['public']['Tables']['notification_delivery_log']['Insert'];
+
+// Notification preferences type (matches JSONB structure in database)
+export interface NotificationPreferences {
+  email_assignments: boolean;
+  email_reminders: boolean;
+  email_reviews: boolean;
+  email_digest: boolean;
+  sms_assignments: boolean;
+  sms_reminders: boolean;
+  sms_reviews: boolean;
+  in_app_all: boolean;
+  push_enabled: boolean;
+  quiet_hours_start: string | null;
+  quiet_hours_end: string | null;
+  digest_day: string;
+  digest_time: string;
+}
+
+// Notification channel type
+export type NotificationChannel = 'email' | 'sms' | 'in_app' | 'push';
+
+// Notification queue status type
+export type NotificationQueueStatus = 'pending' | 'processing' | 'sent' | 'delivered' | 'failed' | 'cancelled';
+
+// Notification delivery event type
+export type NotificationDeliveryEvent = 'queued' | 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounced' | 'failed';

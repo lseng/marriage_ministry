@@ -20,6 +20,7 @@ describe('useCurrentProfile', () => {
       role: 'admin',
       failed_login_attempts: 0,
       locked_until: null,
+      notification_preferences: {},
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
     },

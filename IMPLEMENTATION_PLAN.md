@@ -231,17 +231,19 @@ npm run build   → Success (532 kB bundle)
 ### Medium Priority
 
 #### M1: Create Notifications Database Schema
-- [ ] Add notification tables for multi-channel delivery
-  - Files: `supabase/migrations/YYYYMMDD_notifications.sql`, `types/database.ts`
+- [x] Add notification tables for multi-channel delivery ✅ (2026-01-18)
+  - Files: `supabase/migrations/20250120000000_notifications.sql`, `types/database.ts`
   - Spec: `specs/phase-7-notifications.md`
   - Work:
-    - Create `notification_templates` table (id, name, type, subject, body_html, body_sms, body_inapp, variables, is_active)
-    - Create `notification_queue` table (id, template_id, recipient_id, channel, variables, priority, scheduled_for, processed_at, status)
-    - Create `notifications` table (id, user_id, title, body, type, read_at, metadata, created_at)
-    - Create `notification_delivery_log` table (id, notification_id, channel, status, error, sent_at)
-    - Add `notification_preferences` JSONB column to profiles
-    - RLS policies for each table
-  - Validation: Migration applies, types regenerated
+    - Created `notification_templates` table with event_type, subject_template, email_body_template, sms_template, in_app_template, in_app_action_url
+    - Created `notification_queue` table with template_id, recipient_id, channel, variables, priority, status, attempts, scheduled_for
+    - Created `notifications` table (persistent in-app notifications) with recipient_id, title, body, action_url, category, is_read
+    - Created `notification_delivery_log` table for analytics
+    - Added `notification_preferences` JSONB column to profiles with default values for email, SMS, in-app, quiet hours
+    - RLS policies: admin-only for templates, service-role for queue, users see own notifications, admin for delivery logs
+    - Inserted 10 default notification templates (assignment_new, assignment_reminder, assignment_overdue, submission_received, review_completed, couple_assigned, couple_inactive, welcome, weekly_digest)
+    - Updated TypeScript types with all new table types and NotificationPreferences interface
+  - Validation: Lint, build, and all 155 tests pass
 
 #### M2: Enhance In-App Notifications with Database Persistence
 - [ ] Wire up notification bell with database-backed notifications
