@@ -3,7 +3,7 @@
 
 -- Form Templates table for dynamic homework forms
 CREATE TABLE IF NOT EXISTS public.form_templates (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
     fields JSONB NOT NULL DEFAULT '[]',
@@ -19,7 +19,7 @@ ADD COLUMN IF NOT EXISTS form_template_id UUID REFERENCES public.form_templates(
 
 -- Homework Responses table with JSONB responses
 CREATE TABLE IF NOT EXISTS public.homework_responses (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     assignment_status_id UUID REFERENCES public.assignment_statuses(id) NOT NULL,
     couple_id UUID REFERENCES public.couples(id) NOT NULL,
     responses JSONB NOT NULL DEFAULT '{}',

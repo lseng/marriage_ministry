@@ -1,8 +1,8 @@
 -- Marriage Ministry Database Schema
 -- Initial migration
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Enable UUID extension (using schema-qualified extension)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 
 -- Users table (extends Supabase auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 -- Coaches table
 CREATE TABLE IF NOT EXISTS public.coaches (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id),
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.coaches (
 
 -- Couples table
 CREATE TABLE IF NOT EXISTS public.couples (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     husband_first_name TEXT NOT NULL,
     husband_last_name TEXT NOT NULL,
     wife_first_name TEXT NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.couples (
 
 -- Assignments table
 CREATE TABLE IF NOT EXISTS public.assignments (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
     content TEXT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS public.assignments (
 
 -- Assignment responses table
 CREATE TABLE IF NOT EXISTS public.assignment_responses (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     assignment_id UUID REFERENCES public.assignments(id) NOT NULL,
     couple_id UUID REFERENCES public.couples(id) NOT NULL,
     response_text TEXT NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.assignment_responses (
 
 -- Assignment status tracking
 CREATE TABLE IF NOT EXISTS public.assignment_statuses (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     assignment_id UUID REFERENCES public.assignments(id) NOT NULL,
     couple_id UUID REFERENCES public.couples(id) NOT NULL,
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'completed', 'overdue')),
