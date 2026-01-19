@@ -24,8 +24,11 @@ SlashCommand = Literal[
     "/implement",
     # Testing commands
     "/test",
+    "/test_gen",
     "/e2e_test",
     "/run_tests",
+    "/resolve_failed_test",
+    "/resolve_failed_e2e_test",
     "/validate",
     "/review",
     # Supabase commands
@@ -156,3 +159,50 @@ class ClaudeCodeResultMessage(BaseModel):
     result: str
     session_id: str
     total_cost_usd: float
+
+
+class TestResult(BaseModel):
+    """Individual test result from test suite execution."""
+
+    test_name: str
+    passed: bool
+    execution_command: str
+    test_purpose: str
+    error: Optional[str] = None
+
+
+class E2ETestResult(BaseModel):
+    """Individual E2E test result from browser automation."""
+
+    test_name: str
+    status: Literal["passed", "failed"]
+    test_path: str  # Path to the test file for re-execution
+    screenshots: List[str] = []
+    error: Optional[str] = None
+
+    @property
+    def passed(self) -> bool:
+        """Check if test passed."""
+        return self.status == "passed"
+
+
+class ADWStateData(BaseModel):
+    """Minimal persistent state for ADW workflow.
+
+    Stored in agents/{adw_id}/adw_state.json
+    Contains only essential identifiers to connect workflow steps.
+    """
+
+    adw_id: str
+    issue_number: Optional[str] = None
+    branch_name: Optional[str] = None
+    plan_file: Optional[str] = None
+    issue_class: Optional[IssueClassSlashCommand] = None
+    # Worktree isolation fields (TAC-7 hybrid)
+    worktree_path: Optional[str] = None
+    backend_port: Optional[int] = None
+    frontend_port: Optional[int] = None
+    # Loop tracking fields (Ralph hybrid)
+    mode: Optional[Literal["plan", "build"]] = None
+    iteration: Optional[int] = None
+    model_set: Optional[Literal["base", "heavy"]] = None

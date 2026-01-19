@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   FileEdit,
   CheckSquare,
+  User,
 } from 'lucide-react';
 import type { UserRole } from '../../types/database';
 
@@ -64,6 +65,12 @@ const navItems: NavItem[] = [
     label: 'Form Builder',
     icon: <FileText className="h-5 w-5" />,
     roles: ['admin'],
+  },
+  {
+    to: '/profile',
+    label: 'My Profile',
+    icon: <User className="h-5 w-5" />,
+    roles: ['admin', 'coach', 'couple'],
   },
 ];
 

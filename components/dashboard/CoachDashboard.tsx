@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { MetricCard } from './MetricCard';
+import { ViewAllLink } from './ViewAllLink';
 import { EmptyState } from '../ui/empty-state';
 import { Avatar } from '../ui/avatar';
 import { StatusBadge, StatusType } from '../ui/badge';
@@ -179,27 +180,33 @@ export function CoachDashboard() {
           title="Assigned Couples"
           value={data?.assignedCouples.length ?? 0}
           icon={Heart}
+          href="/couples"
         />
         <MetricCard
           title="Pending Reviews"
           value={data?.pendingReviews.length ?? 0}
           icon={ClipboardList}
+          href="/reviews"
         />
         <MetricCard
           title="Upcoming Assignments"
           value={data?.upcomingForCouples.length ?? 0}
           icon={Clock}
+          href="/assignments"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* My Couples */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
               My Couples
             </CardTitle>
+            {(data?.assignedCouples.length ?? 0) > 5 && (
+              <ViewAllLink href="/couples" label="View All" />
+            )}
           </CardHeader>
           <CardContent>
             {(data?.assignedCouples.length ?? 0) === 0 ? (
@@ -213,8 +220,16 @@ export function CoachDashboard() {
                 {data?.assignedCouples.slice(0, 5).map((couple) => (
                   <div
                     key={couple.id}
-                    className="flex items-center justify-between p-2 rounded-md hover:bg-muted cursor-pointer"
+                    className="flex items-center justify-between p-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
                     onClick={() => navigate(`/couples/${couple.id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate(`/couples/${couple.id}`);
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar
@@ -240,11 +255,14 @@ export function CoachDashboard() {
 
         {/* Pending Reviews */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5" />
               Pending Reviews
             </CardTitle>
+            {(data?.pendingReviews.length ?? 0) > 0 && (
+              <ViewAllLink href="/reviews" label="View All" />
+            )}
           </CardHeader>
           <CardContent>
             {(data?.pendingReviews.length ?? 0) === 0 ? (
@@ -258,7 +276,16 @@ export function CoachDashboard() {
                 {data?.pendingReviews.slice(0, 5).map((review) => (
                   <div
                     key={review.id}
-                    className="flex items-center justify-between p-2 rounded-md hover:bg-muted cursor-pointer"
+                    className="flex items-center justify-between p-2 rounded-md hover:bg-muted cursor-pointer transition-colors"
+                    onClick={() => navigate('/reviews')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate('/reviews');
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
                   >
                     <div>
                       <p className="text-sm font-medium">

@@ -15,6 +15,14 @@ export interface RecentActivity {
   title: string;
   description: string;
   timestamp: string;
+  /** Entity ID for navigation - couple ID for new_couple, submission ID for submission, etc. */
+  entityId?: string;
+  /** Secondary entity ID - e.g., couple ID for submissions */
+  coupleId?: string;
+  /** Assignment ID for submission activities */
+  assignmentId?: string;
+  /** Coach ID for coach_assigned activities */
+  coachId?: string;
 }
 
 export interface UpcomingAssignment {
@@ -83,6 +91,8 @@ export function useDashboardMetrics(): UseDashboardMetricsResult {
             title: 'New couple enrolled',
             description: `${couple.husband_first_name} & ${couple.wife_first_name}`,
             timestamp: couple.enrollment_date,
+            entityId: couple.id,
+            coupleId: couple.id,
           });
         }
       }
@@ -116,6 +126,9 @@ export function useDashboardMetrics(): UseDashboardMetricsResult {
             title: 'Homework submitted',
             description: `${couple?.husband_first_name ?? ''} & ${couple?.wife_first_name ?? ''} - ${assignment?.title ?? ''}`,
             timestamp: submission.submitted_at,
+            entityId: submission.id,
+            coupleId: submission.couple_id,
+            assignmentId: submission.assignment_id,
           });
         }
       }

@@ -41,6 +41,11 @@ playwright/.cache/
 # ADW (AI Developer Workflow)
 adws/venv/
 agents/
+trees/
+
+# Ralph Loop
+agents/loop_logs/
+IMPLEMENTATION_PLAN.md
 
 # Misc
 *.local
@@ -48,3 +53,7 @@ agents/
 
 # Supabase
 .supabase/
+
+# Python
+__pycache__/
+*.pyc

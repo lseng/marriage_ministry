@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { EmptyState } from '../ui/empty-state';
 import { StatusBadge, StatusType } from '../ui/badge';
+import { Modal } from '../ui/modal';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { ClipboardList, Clock, CheckCircle, FileText } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle, FileText, User, Eye } from 'lucide-react';
 import { formatDate } from '../../lib/date';
 
 interface CoupleAssignment {
@@ -23,12 +25,15 @@ interface CoupleDashboardData {
   currentAssignment: CoupleAssignment | null;
   completedAssignments: CoupleAssignment[];
   coachName: string | null;
+  coachId: string | null;
 }
 
 export function CoupleDashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [data, setData] = useState<CoupleDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedAssignment, setSelectedAssignment] = useState<CoupleAssignment | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,6 +117,7 @@ export function CoupleDashboard() {
           currentAssignment: pending[0] || null,
           completedAssignments: completed,
           coachName,
+          coachId: couple.coach_id,
         });
       } catch (error) {
         console.error('Failed to fetch couple dashboard data:', error);
@@ -141,16 +147,36 @@ export function CoupleDashboard() {
     <div className="space-y-6">
       {/* Coach Info */}
       {data?.coachName && (
-        <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="py-4">
-            <p className="text-sm text-muted-foreground">Your Coach</p>
-            <p className="font-semibold">{data.coachName}</p>
+        <Card
+          className="bg-primary/5 border-primary/20 cursor-pointer hover:shadow-md transition-all"
+          onClick={() => {
+            // Note: Couples typically can't view coach profiles, but we make the card clickable
+            // for future enhancement. For now, it shows a visual feedback.
+          }}
+        >
+          <CardContent className="py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-primary/10 p-2">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Your Coach</p>
+                <p className="font-semibold">{data.coachName}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Current Assignment */}
-      <Card>
+      <Card
+        className={data?.currentAssignment ? 'cursor-pointer hover:shadow-md transition-all' : ''}
+        onClick={() => {
+          if (data?.currentAssignment) {
+            navigate('/homework');
+          }
+        }}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="h-5 w-5" />
@@ -192,7 +218,13 @@ export function CoupleDashboard() {
                 </p>
               )}
 
-              <Button className="w-full sm:w-auto">
+              <Button
+                className="w-full sm:w-auto"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/homework');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Start Assignment
               </Button>
@@ -218,7 +250,16 @@ export function CoupleDashboard() {
               {data?.completedAssignments.map((assignment, index) => (
                 <div
                   key={assignment.id}
-                  className="flex items-start gap-4 relative"
+                  className="flex items-start gap-4 relative cursor-pointer hover:bg-muted/50 rounded-md p-2 -ml-2 transition-colors"
+                  onClick={() => setSelectedAssignment(assignment)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedAssignment(assignment);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
                 >
                   {/* Timeline line */}
                   {index < (data.completedAssignments.length - 1) && (
@@ -231,12 +272,15 @@ export function CoupleDashboard() {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 pb-4">
-                    <p className="font-medium text-sm">{assignment.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Week {assignment.weekNumber}
-                      {assignment.submittedAt && ` • Completed ${formatDate(assignment.submittedAt)}`}
-                    </p>
+                  <div className="flex-1 pb-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">{assignment.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Week {assignment.weekNumber}
+                        {assignment.submittedAt && ` • Completed ${formatDate(assignment.submittedAt)}`}
+                      </p>
+                    </div>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
               ))}
@@ -244,6 +288,39 @@ export function CoupleDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Completed Assignment Detail Modal */}
+      {selectedAssignment && (
+        <Modal
+          isOpen={!!selectedAssignment}
+          onClose={() => setSelectedAssignment(null)}
+          title={selectedAssignment.title}
+          description={`Week ${selectedAssignment.weekNumber} • Completed`}
+        >
+          <div className="space-y-4">
+            {selectedAssignment.description && (
+              <p className="text-muted-foreground">{selectedAssignment.description}</p>
+            )}
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="flex items-center gap-1 text-green-600">
+                <CheckCircle className="h-4 w-4" />
+                Completed {selectedAssignment.submittedAt && formatDate(selectedAssignment.submittedAt)}
+              </span>
+              {selectedAssignment.dueDate && (
+                <span className="flex items-center gap-1 text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  Due date: {formatDate(selectedAssignment.dueDate)}
+                </span>
+              )}
+            </div>
+            <div className="bg-muted/50 rounded-lg p-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                You've successfully completed this assignment. Great work!
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

@@ -1,96 +1,106 @@
-# Test Generation Command
+# Application Validation Test Suite
 
-Generate comprehensive tests for the specified file or feature.
+Execute comprehensive validation tests for both frontend and backend components, returning results in a standardized JSON format for automated processing.
 
-## Input
-$ARGUMENTS - File path, component name, or feature description to test
+## Purpose
+
+Proactively identify and fix issues in the application before they impact users or developers. By running this comprehensive test suite, you can:
+- Detect syntax errors, type mismatches, and import failures
+- Identify broken tests or security vulnerabilities
+- Verify build processes and dependencies
+- Ensure the application is in a healthy state
+
+## Variables
+
+TEST_COMMAND_TIMEOUT: 5 minutes
 
 ## Instructions
 
-1. **Analyze the Target**
-   - Read the file/component to understand its functionality
-   - Identify all public APIs, props, states, and side effects
-   - Map out dependencies and external integrations
+- Execute each test in the sequence provided below
+- Capture the result (passed/failed) and any error messages
+- IMPORTANT: Return ONLY the JSON array with test results
+  - IMPORTANT: Do not include any additional text, explanations, or markdown formatting
+  - We'll immediately run JSON.parse() on the output, so make sure it's valid JSON
+- If a test passes, omit the error field
+- If a test fails, include the error message in the error field
+- Execute all tests even if some fail
+- Error Handling:
+  - If a command returns non-zero exit code, mark as failed and immediately stop processing tests
+  - Capture stderr output for error field
+  - Timeout commands after `TEST_COMMAND_TIMEOUT`
+  - IMPORTANT: If a test fails, stop processing tests and return the results thus far
+- Some tests may have dependencies (e.g., server must be stopped for port availability)
+- Test execution order is important - dependencies should be validated first
+- All file paths are relative to the project root
+- Always run `pwd` and `cd` before each test to ensure you're operating in the correct directory for the given test
 
-2. **Identify Test Cases**
-   - Happy path scenarios
-   - Edge cases (empty states, max values, null/undefined)
-   - Error conditions and error handling
-   - Boundary conditions
-   - User interaction flows
-   - Async operations and loading states
+## Test Execution Sequence
 
-3. **Generate Unit Tests** (Vitest + React Testing Library)
-   - Create test file at `src/**/__tests__/[name].test.tsx` or `src/**/[name].test.tsx`
-   - Test each function/method individually
-   - Mock external dependencies (Supabase, APIs)
-   - Use test utilities from `src/test/utils.tsx`
-   - Follow AAA pattern: Arrange, Act, Assert
+### Frontend Tests
 
-4. **Generate Integration Tests** (if applicable)
-   - Test component interactions
-   - Test data flow between components
-   - Test with realistic mock data
+1. **TypeScript Type Check**
+   - Preparation Command: None
+   - Command: `npm run build -- --mode=development 2>&1 | head -50 || npx tsc --noEmit`
+   - test_name: "typescript_check"
+   - test_purpose: "Validates TypeScript type correctness, catching type errors, missing imports, and incorrect function signatures"
 
-5. **Generate E2E Tests** (Playwright)
-   - Create test file at `e2e/[feature].spec.ts`
-   - Test complete user workflows
-   - Test across different viewports
-   - Use helpers from `e2e/utils/helpers.ts`
-   - Include visual assertions
+2. **ESLint Check**
+   - Preparation Command: None
+   - Command: `npm run lint`
+   - test_name: "eslint_check"
+   - test_purpose: "Validates code quality, identifies unused imports, style violations, and potential bugs"
 
-6. **Test Quality Checklist**
-   - [ ] Tests are deterministic (no flaky tests)
-   - [ ] Tests are independent (no shared state)
-   - [ ] Tests have descriptive names
-   - [ ] Tests cover error scenarios
-   - [ ] Tests use proper async/await
-   - [ ] Mocks are properly cleaned up
+3. **Unit Tests**
+   - Preparation Command: None
+   - Command: `npm run test:run`
+   - test_name: "unit_tests"
+   - test_purpose: "Validates component behavior, hooks, and utilities through Vitest tests"
 
-## Output Format
+4. **Frontend Build**
+   - Preparation Command: None
+   - Command: `npm run build`
+   - test_name: "frontend_build"
+   - test_purpose: "Validates the complete frontend build process including bundling, asset optimization, and production compilation"
 
-Create the test files and report:
-- Number of test cases generated
-- Coverage areas addressed
-- Any gaps or manual testing recommendations
+## Report
 
-## Example
+- IMPORTANT: Return results exclusively as a JSON array based on the `Output Structure` section below.
+- Sort the JSON array with failed tests (passed: false) at the top
+- Include all tests in the output, both passed and failed
+- The execution_command field should contain the exact command that can be run to reproduce the test
+- This allows subsequent agents to quickly identify and resolve errors
 
-For a component `src/components/CoachCard.tsx`:
+### Output Structure
 
-```typescript
-// src/components/__tests__/CoachCard.test.tsx
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@/test/utils';
-import { CoachCard } from '../CoachCard';
-import { createMockCoach } from '@/test/utils';
+```json
+[
+  {
+    "test_name": "string",
+    "passed": boolean,
+    "execution_command": "string",
+    "test_purpose": "string",
+    "error": "optional string"
+  },
+  ...
+]
+```
 
-describe('CoachCard', () => {
-  it('renders coach name correctly', () => {
-    const coach = createMockCoach({ first_name: 'John', last_name: 'Doe' });
-    render(<CoachCard coach={coach} />);
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-  });
+### Example Output
 
-  it('displays assigned couples count', () => {
-    const coach = createMockCoach({ assigned_couples_count: 5 });
-    render(<CoachCard coach={coach} />);
-    expect(screen.getByText(/5 couples/i)).toBeInTheDocument();
-  });
-
-  it('handles click event', async () => {
-    const onClick = vi.fn();
-    const coach = createMockCoach();
-    const { user } = render(<CoachCard coach={coach} onClick={onClick} />);
-
-    await user.click(screen.getByRole('article'));
-    expect(onClick).toHaveBeenCalledWith(coach);
-  });
-
-  it('shows inactive badge when coach is inactive', () => {
-    const coach = createMockCoach({ status: 'inactive' });
-    render(<CoachCard coach={coach} />);
-    expect(screen.getByText(/inactive/i)).toBeInTheDocument();
-  });
-});
+```json
+[
+  {
+    "test_name": "frontend_build",
+    "passed": false,
+    "execution_command": "npm run build",
+    "test_purpose": "Validates TypeScript compilation, module resolution, and production build process for the frontend application",
+    "error": "TS2345: Argument of type 'string' is not assignable to parameter of type 'number'"
+  },
+  {
+    "test_name": "unit_tests",
+    "passed": true,
+    "execution_command": "npm run test:run",
+    "test_purpose": "Validates component behavior, hooks, and utilities through Vitest tests"
+  }
+]
 ```

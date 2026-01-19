@@ -1,0 +1,13 @@
+[project]
+name = "marriage-ministry-adws"
+version = "0.1.0"
+description = "AI Developer Workflow system for Marriage Ministry"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
+
+[tool.uv]
+dev-dependencies = []

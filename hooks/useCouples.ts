@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as couplesService from '../services/couples';
 import type { Couple } from '../types/database';
+import type { CoupleWithDetails } from '../services/couples';
 
 type CoupleWithCoach = Couple & { coach?: { first_name: string; last_name: string } | null };
 
@@ -96,4 +97,47 @@ export function useCoachOptions(): UseCoachOptionsResult {
   }, []);
 
   return { coaches, loading };
+}
+
+interface UseCoupleResult {
+  couple: CoupleWithDetails | null;
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+}
+
+export function useCouple(id: string | null): UseCoupleResult {
+  const [couple, setCouple] = useState<CoupleWithDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCouple = useCallback(async () => {
+    if (!id) {
+      setCouple(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await couplesService.getCoupleWithDetails(id);
+      setCouple(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch couple');
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchCouple();
+  }, [fetchCouple]);
+
+  return {
+    couple,
+    loading,
+    error,
+    refresh: fetchCouple,
+  };
 }

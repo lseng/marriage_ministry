@@ -6,11 +6,13 @@ import { Badge } from '../ui/badge';
 import { EmptyState } from '../ui/empty-state';
 import { LoadingSpinner } from '../ui/loading-spinner';
 import { AssignmentForm, AssignmentFormData } from './AssignmentForm';
+import { AssignmentDetailModal } from './AssignmentDetailModal';
 import { DistributeModal } from './DistributeModal';
 import { useAssignments } from '../../hooks/useAssignments';
 import { useAuth } from '../../contexts/AuthContext';
 import { Plus, Search, ClipboardList, MoreVertical, Edit, Trash2, Send, CheckCircle, Clock } from 'lucide-react';
 import { formatDate } from '../../lib/date';
+import type { AssignmentWithStats } from '../../services/assignments';
 
 export function AssignmentsList() {
   const { role } = useAuth();
@@ -19,6 +21,7 @@ export function AssignmentsList() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<typeof assignments[0] | null>(null);
   const [distributingAssignment, setDistributingAssignment] = useState<typeof assignments[0] | null>(null);
+  const [selectedAssignment, setSelectedAssignment] = useState<AssignmentWithStats | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const isAdmin = role === 'admin';
@@ -65,6 +68,21 @@ export function AssignmentsList() {
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setEditingAssignment(null);
+  };
+
+  const handleCardClick = (assignment: AssignmentWithStats) => {
+    setSelectedAssignment(assignment);
+  };
+
+  const handleEditFromModal = (assignment: AssignmentWithStats) => {
+    setSelectedAssignment(null);
+    setEditingAssignment(assignment);
+    setIsFormOpen(true);
+  };
+
+  const handleDistributeFromModal = (assignment: AssignmentWithStats) => {
+    setSelectedAssignment(null);
+    setDistributingAssignment(assignment);
   };
 
   if (loading) {
@@ -146,7 +164,20 @@ export function AssignmentsList() {
       ) : (
         <div className="space-y-4">
           {filteredAssignments.map((assignment) => (
-            <Card key={assignment.id} className="p-6">
+            <Card
+              key={assignment.id}
+              className="p-6 cursor-pointer hover:shadow-md hover:border-primary/30 transition-all"
+              onClick={() => handleCardClick(assignment)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleCardClick(assignment);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label={`View ${assignment.title} details`}
+            >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start gap-3">
@@ -184,11 +215,14 @@ export function AssignmentsList() {
                 </div>
 
                 {isAdmin && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setDistributingAssignment(assignment)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDistributingAssignment(assignment);
+                      }}
                     >
                       <Send className="h-4 w-4 mr-1" />
                       Distribute
@@ -196,7 +230,10 @@ export function AssignmentsList() {
 
                     <div className="relative">
                       <button
-                        onClick={() => setActiveMenu(activeMenu === assignment.id ? null : assignment.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveMenu(activeMenu === assignment.id ? null : assignment.id);
+                        }}
                         className="p-2 hover:bg-muted rounded"
                       >
                         <MoreVertical className="h-4 w-4 text-muted-foreground" />
@@ -205,19 +242,28 @@ export function AssignmentsList() {
                         <>
                           <div
                             className="fixed inset-0 z-10"
-                            onClick={() => setActiveMenu(null)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenu(null);
+                            }}
                           />
                           <div className="absolute right-0 top-10 z-20 w-32 rounded-md border bg-popover shadow-md">
                             <button
                               className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
-                              onClick={() => handleEdit(assignment)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(assignment);
+                              }}
                             >
                               <Edit className="h-4 w-4" />
                               Edit
                             </button>
                             <button
                               className="flex w-full items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-muted"
-                              onClick={() => handleDelete(assignment)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(assignment);
+                              }}
                             >
                               <Trash2 className="h-4 w-4" />
                               Delete
@@ -251,6 +297,15 @@ export function AssignmentsList() {
           assignmentTitle={distributingAssignment.title}
         />
       )}
+
+      {/* Assignment Detail Modal */}
+      <AssignmentDetailModal
+        isOpen={!!selectedAssignment}
+        onClose={() => setSelectedAssignment(null)}
+        assignment={selectedAssignment}
+        onEdit={isAdmin ? handleEditFromModal : undefined}
+        onDistribute={isAdmin ? handleDistributeFromModal : undefined}
+      />
     </div>
   );
 }

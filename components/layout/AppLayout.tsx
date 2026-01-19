@@ -1,16 +1,18 @@
 import { useState, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Sidebar, MobileMenuButton } from './Sidebar';
 import { Avatar } from '../ui/avatar';
 import { NotificationBell } from '../ui/notification-bell';
 import { cn } from '../../lib/utils';
-import { LogOut, ChevronDown } from 'lucide-react';
+import { LogOut, ChevronDown, User } from 'lucide-react';
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const navigate = useNavigate();
   const { user, profile, role, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -87,6 +89,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <p className="text-sm font-medium truncate">{displayName}</p>
                     <p className="text-xs text-muted-foreground">{roleLabel}</p>
                   </div>
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate('/profile');
+                    }}
+                    className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-muted transition-colors"
+                  >
+                    <User className="h-4 w-4" />
+                    View Profile
+                  </button>
                   <button
                     onClick={handleSignOut}
                     className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
