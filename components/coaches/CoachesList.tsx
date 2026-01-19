@@ -8,17 +8,21 @@ import { Avatar } from '../ui/avatar';
 import { EmptyState } from '../ui/empty-state';
 import { LoadingSpinner } from '../ui/loading-spinner';
 import { CoachForm, CoachFormData } from './CoachForm';
+import { InviteUserModal } from '../admin/InviteUserModal';
 import { useCoaches } from '../../hooks/useCoaches';
-import { Plus, Search, Users, LayoutGrid, List, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Plus, Search, Users, LayoutGrid, List, MoreVertical, Edit, Trash2, Mail } from 'lucide-react';
 
 type ViewMode = 'grid' | 'list';
 
 export function CoachesList() {
   const navigate = useNavigate();
+  const { permissions } = useAuth();
   const { coaches, loading, error, createCoach, updateCoach, deleteCoach } = useCoaches();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [editingCoach, setEditingCoach] = useState<typeof coaches[0] | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
@@ -90,10 +94,18 @@ export function CoachesList() {
             Manage your marriage ministry coaches
           </p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Coach
-        </Button>
+        <div className="flex gap-2">
+          {permissions.canManageCoaches && (
+            <Button variant="outline" onClick={() => setIsInviteOpen(true)}>
+              <Mail className="h-4 w-4 mr-2" />
+              Invite Coach
+            </Button>
+          )}
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Coach
+          </Button>
+        </div>
       </header>
 
       {/* Filters and View Toggle */}
@@ -309,6 +321,13 @@ export function CoachesList() {
         onClose={handleCloseForm}
         onSubmit={handleSubmit}
         coach={editingCoach}
+      />
+
+      {/* Invite Coach Modal */}
+      <InviteUserModal
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        defaultRole="coach"
       />
     </div>
   );

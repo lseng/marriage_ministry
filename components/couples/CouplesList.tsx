@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -9,21 +9,42 @@ import { Avatar } from '../ui/avatar';
 import { EmptyState } from '../ui/empty-state';
 import { LoadingSpinner } from '../ui/loading-spinner';
 import { CoupleForm, CoupleFormData } from './CoupleForm';
+import { InviteUserModal } from '../admin/InviteUserModal';
 import { useCouples, useCoachOptions } from '../../hooks/useCouples';
-import { Plus, Search, Heart, LayoutGrid, List, MoreVertical, Edit, Trash2, UserPlus } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Plus, Search, Heart, LayoutGrid, List, MoreVertical, Edit, Trash2, UserPlus, Mail } from 'lucide-react';
 import { formatDate } from '../../lib/date';
 
 type ViewMode = 'grid' | 'list';
 
 export function CouplesList() {
   const navigate = useNavigate();
+  const { permissions } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { couples, loading, error, createCouple, updateCouple, deleteCouple } = useCouples();
   const { coaches } = useCoachOptions();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [coachFilter, setCoachFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || '');
+  const [coachFilter, setCoachFilter] = useState<string>(searchParams.get('coach') || '');
+
+  // Sync status filter to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (statusFilter) {
+      params.set('status', statusFilter);
+    } else {
+      params.delete('status');
+    }
+    if (coachFilter) {
+      params.set('coach', coachFilter);
+    } else {
+      params.delete('coach');
+    }
+    setSearchParams(params, { replace: true });
+  }, [statusFilter, coachFilter, setSearchParams, searchParams]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [editingCouple, setEditingCouple] = useState<typeof couples[0] | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
@@ -113,10 +134,18 @@ export function CouplesList() {
             Track and manage couples in the ministry
           </p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Couple
-        </Button>
+        <div className="flex gap-2">
+          {permissions.canManageCouples && (
+            <Button variant="outline" onClick={() => setIsInviteOpen(true)}>
+              <Mail className="h-4 w-4 mr-2" />
+              Invite Couple
+            </Button>
+          )}
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Couple
+          </Button>
+        </div>
       </header>
 
       {/* Filters */}
@@ -362,6 +391,13 @@ export function CouplesList() {
         onClose={handleCloseForm}
         onSubmit={handleSubmit}
         couple={editingCouple}
+      />
+
+      {/* Invite Couple Modal */}
+      <InviteUserModal
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        defaultRole="couple"
       />
     </div>
   );
