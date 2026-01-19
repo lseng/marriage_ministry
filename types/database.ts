@@ -297,6 +297,41 @@ export interface Database {
           updated_at?: string
         }
       }
+      invitations: {
+        Row: {
+          id: string
+          email: string
+          role: UserRole
+          invited_by: string | null
+          invitation_token: string
+          expires_at: string
+          accepted_at: string | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          role: UserRole
+          invited_by?: string | null
+          invitation_token: string
+          expires_at: string
+          accepted_at?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          role?: UserRole
+          invited_by?: string | null
+          invitation_token?: string
+          expires_at?: string
+          accepted_at?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -319,3 +354,6 @@ export type AssignmentResponse = Database['public']['Tables']['assignment_respon
 export type AssignmentStatus = Database['public']['Tables']['assignment_statuses']['Row'];
 export type FormTemplateRow = Database['public']['Tables']['form_templates']['Row'];
 export type HomeworkResponseRow = Database['public']['Tables']['homework_responses']['Row'];
+export type Invitation = Database['public']['Tables']['invitations']['Row'];
+export type InvitationInsert = Database['public']['Tables']['invitations']['Insert'];
+export type InvitationUpdate = Database['public']['Tables']['invitations']['Update'];
