@@ -87,7 +87,7 @@ npm run test    → 232 tests passed (16 test files)
 | **services/** | 16% | Only notifications.ts has tests |
 | **components/** | 41% | Auth, dashboard, profile components covered |
 
-**Unit Tests (18 test files, 287 tests):**
+**Unit Tests (19 test files, 314 tests):**
 - `components/auth/__tests__/LoginPage.test.tsx`
 - `contexts/__tests__/AuthContext.test.tsx`
 - `hooks/__tests__/useProfile.test.ts`
@@ -103,7 +103,8 @@ npm run test    → 232 tests passed (16 test files)
 - `components/assignments/__tests__/AssignmentDetailModal.test.tsx`
 - `services/__tests__/notifications.test.ts`
 - `services/__tests__/coaches.test.ts` (23 tests)
-- `services/__tests__/couples.test.ts` (NEW - 32 tests)
+- `services/__tests__/couples.test.ts` (32 tests)
+- `services/__tests__/assignments.test.ts` (NEW - 27 tests)
 - `types/forms.test.ts`
 - `lib/date.test.ts`
 - `lib/permissions.test.ts`
@@ -161,7 +162,7 @@ All Phase 1 requirements have been implemented:
 | notifications.ts | ✅ notifications.test.ts | Complete (98.7% coverage) |
 | coaches.ts | ✅ coaches.test.ts | Complete (23 tests) |
 | couples.ts | ✅ couples.test.ts | Complete (32 tests) |
-| assignments.ts | ❌ assignments.test.ts | Missing (0% coverage) |
+| assignments.ts | ✅ assignments.test.ts | Complete (27 tests) |
 | homework.ts | ❌ homework.test.ts | Missing (0% coverage) |
 | invitations.ts | ❌ invitations.test.ts | Missing (0% coverage) |
 | profile.ts | ❌ profile.test.ts | Missing (0% coverage) |
@@ -196,9 +197,9 @@ All Phase 1 requirements have been implemented:
     - Test error handling and edge cases
   - Validation: ✅ All 32 tests passing, 287 total tests now
 
-#### H3: Add Service Layer Tests for assignments.ts
-- [ ] Create unit tests for assignments service
-  - Files: `services/__tests__/assignments.test.ts` (new)
+#### H3: Add Service Layer Tests for assignments.ts ✅
+- [x] Create unit tests for assignments service
+  - Files: `services/__tests__/assignments.test.ts` (completed)
   - Spec: AGENTS.md (target: 70%+ coverage)
   - Work:
     - Mock Supabase client responses
@@ -207,7 +208,7 @@ All Phase 1 requirements have been implemented:
     - Test distributeAssignment() with all target types (all, coach, specific)
     - Test getAssignmentStatuses()
     - Test error handling
-  - Validation: `npm run test:run` passes, coverage improves
+  - Validation: ✅ All 27 tests passing, 314 total tests now
 
 #### H4: Add Service Layer Tests for homework.ts
 - [ ] Create unit tests for homework service
