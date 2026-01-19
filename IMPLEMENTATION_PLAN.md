@@ -14,7 +14,7 @@ The Marriage Ministry application has a **comprehensive foundation** with most c
 ```
 npm run lint    → 0 warnings (passing)
 npm run build   → Success (570 kB bundle)
-npm run test    → 385 tests passed (21 test files)
+npm run test    → 404 tests passed (22 test files)
 ```
 
 ### Fully Implemented ✓
@@ -84,10 +84,10 @@ npm run test    → 385 tests passed (21 test files)
 | **lib/** | 98% | Excellent - date.ts, permissions.ts, utils.ts |
 | **types/** | 100% | forms.ts validation functions |
 | **hooks/** | 44% | Partial - useCoaches, useCouples, useAssignments, useProfile covered |
-| **services/** | 16% | Only notifications.ts has tests |
+| **services/** | High | All major services tested (notifications, coaches, couples, assignments, homework, invitations, profile) |
 | **components/** | 41% | Auth, dashboard, profile components covered |
 
-**Unit Tests (21 test files, 385 tests):**
+**Unit Tests (22 test files, 404 tests):**
 - `components/auth/__tests__/LoginPage.test.tsx`
 - `contexts/__tests__/AuthContext.test.tsx`
 - `hooks/__tests__/useProfile.test.ts`
@@ -106,7 +106,8 @@ npm run test    → 385 tests passed (21 test files)
 - `services/__tests__/couples.test.ts` (32 tests)
 - `services/__tests__/assignments.test.ts` (27 tests)
 - `services/__tests__/homework.test.ts` (46 tests)
-- `services/__tests__/invitations.test.ts` (NEW - 25 tests)
+- `services/__tests__/invitations.test.ts` (25 tests)
+- `services/__tests__/profile.test.ts` (NEW - 19 tests)
 - `types/forms.test.ts`
 - `lib/date.test.ts`
 - `lib/permissions.test.ts`
@@ -167,7 +168,7 @@ All Phase 1 requirements have been implemented:
 | assignments.ts | ✅ assignments.test.ts | Complete (27 tests) |
 | homework.ts | ✅ homework.test.ts | Complete (46 tests) |
 | invitations.ts | ✅ invitations.test.ts | Complete (25 tests) |
-| profile.ts | ❌ profile.test.ts | Missing (0% coverage) |
+| profile.ts | ✅ profile.test.ts | Complete (19 tests) |
 
 ---
 
@@ -238,17 +239,17 @@ All Phase 1 requirements have been implemented:
     - Test getInvitationUrl()
   - Validation: ✅ All 25 tests passing, 385 total tests now
 
-#### H6: Add Service Layer Tests for profile.ts
-- [ ] Create unit tests for profile service
-  - Files: `services/__tests__/profile.test.ts` (new)
+#### H6: Add Service Layer Tests for profile.ts ✅
+- [x] Create unit tests for profile service
+  - Files: `services/__tests__/profile.test.ts` (completed)
   - Spec: AGENTS.md (target: 70%+ coverage)
   - Work:
     - Mock Supabase client and auth responses
-    - Test getCurrentUserProfile() with role-specific data
+    - Test getCurrentUserProfile() with role-specific data (admin, coach, couple)
     - Test updateUserEmail(), updateUserPassword()
     - Test verifyCurrentPassword()
-    - Test error handling
-  - Validation: `npm run test:run` passes, coverage improves
+    - Test error handling and edge cases (null coach, null couples, etc.)
+  - Validation: ✅ All 19 tests passing, 404 total tests now
 
 ---
 
