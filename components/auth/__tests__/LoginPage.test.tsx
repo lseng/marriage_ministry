@@ -584,6 +584,9 @@ describe('LoginPage', () => {
       expect(screen.getByLabelText(/email/i)).toHaveFocus();
 
       await user.tab();
+      expect(screen.getByRole('link', { name: /forgot password/i })).toHaveFocus();
+
+      await user.tab();
       expect(screen.getByLabelText(/password/i)).toHaveFocus();
 
       await user.tab();

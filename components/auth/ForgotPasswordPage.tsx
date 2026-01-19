@@ -1,22 +1,15 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
-import { Heart } from 'lucide-react';
+import { Heart, Mail } from 'lucide-react';
 
-type AuthMode = 'password' | 'magic-link';
-
-export function LoginPage() {
+export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [authMode, setAuthMode] = useState<AuthMode>('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
-
-  const { signIn, signInWithMagicLink } = useAuth();
-  const navigate = useNavigate();
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,13 +17,16 @@ export function LoginPage() {
     setError(null);
 
     try {
-      if (authMode === 'password') {
-        await signIn(email, password);
-        navigate('/');
-      } else {
-        await signInWithMagicLink(email);
-        setMagicLinkSent(true);
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (resetError) {
+        setError(resetError.message);
+        return;
       }
+
+      setEmailSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -38,30 +34,36 @@ export function LoginPage() {
     }
   };
 
-  if (magicLinkSent) {
+  if (emailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Heart className="h-6 w-6 text-primary" />
+              <Mail className="h-6 w-6 text-primary" />
             </div>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
-              We sent a magic link to <strong>{email}</strong>. Click the link in
-              the email to sign in.
+              We sent a password reset link to <strong>{email}</strong>. Click the link in
+              the email to reset your password.
             </CardDescription>
           </CardHeader>
-          <CardFooter className="flex justify-center">
+          <CardFooter className="flex flex-col space-y-4">
             <Button
               variant="ghost"
               onClick={() => {
-                setMagicLinkSent(false);
+                setEmailSent(false);
                 setEmail('');
               }}
+              className="w-full"
             >
               Use a different email
             </Button>
+            <Link to="/login" className="w-full">
+              <Button variant="outline" className="w-full">
+                Return to Sign In
+              </Button>
+            </Link>
           </CardFooter>
         </Card>
       </div>
@@ -75,9 +77,9 @@ export function LoginPage() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Heart className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Marriage Ministry</CardTitle>
+          <CardTitle>Forgot your password?</CardTitle>
           <CardDescription>
-            Sign in to access the ministry dashboard
+            Enter your email address and we&apos;ll send you a link to reset your password.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -105,55 +107,16 @@ export function LoginPage() {
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
-
-            {authMode === 'password' && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Password
-                  </label>
-                  <Link
-                    to="/auth/forgot-password"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading
-                ? 'Signing in...'
-                : authMode === 'password'
-                ? 'Sign in'
-                : 'Send magic link'}
+              {loading ? 'Sending...' : 'Send Reset Link'}
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() =>
-                setAuthMode(authMode === 'password' ? 'magic-link' : 'password')
-              }
-            >
-              {authMode === 'password'
-                ? 'Use magic link instead'
-                : 'Use password instead'}
-            </Button>
+            <Link to="/login" className="w-full">
+              <Button type="button" variant="ghost" className="w-full">
+                Back to Sign In
+              </Button>
+            </Link>
           </CardFooter>
         </form>
       </Card>

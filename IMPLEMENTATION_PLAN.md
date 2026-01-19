@@ -196,7 +196,7 @@ npm run build   → Success (532 kB bundle)
   - Validation: Full flow from invitation link to logged-in dashboard
 
 #### H5: Implement Forgot/Reset Password Flow
-- [ ] Add forgot and reset password pages
+- [x] Add forgot and reset password pages ✅ (2026-01-18)
   - Files:
     - `components/auth/ForgotPasswordPage.tsx` (new)
     - `components/auth/ResetPasswordPage.tsx` (new)

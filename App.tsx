@@ -4,6 +4,8 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { ToastProvider } from './components/ui/toast';
 import { LoginPage } from './components/auth/LoginPage';
 import { AcceptInvitePage } from './components/auth/AcceptInvitePage';
+import { ForgotPasswordPage } from './components/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './components/dashboard/Dashboard';
@@ -35,6 +37,8 @@ function App() {
             <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/accept-invite" element={<AcceptInvitePage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/"
             element={
