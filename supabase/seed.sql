@@ -1,5 +1,9 @@
 -- Marriage Ministry Database Seed File
 -- Comprehensive seed data for testing and demonstration
+
+-- Enable pgcrypto for password hashing
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 --
 -- Test Users:
 --   Admin:   admin@test.com / password123
@@ -129,7 +133,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         admin_user_id, '00000000-0000-0000-0000-000000000000',
-        'admin@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'admin@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "Admin User"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''
@@ -143,7 +147,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         coach1_user_id, '00000000-0000-0000-0000-000000000000',
-        'coach@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'coach@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "John Doe"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''
@@ -157,7 +161,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         coach2_user_id, '00000000-0000-0000-0000-000000000000',
-        'coach2@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'coach2@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "Sarah Johnson"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''
@@ -171,7 +175,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         coach3_user_id, '00000000-0000-0000-0000-000000000000',
-        'coach3@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'coach3@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "Michael Brown"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''
@@ -185,7 +189,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         coach4_user_id, '00000000-0000-0000-0000-000000000000',
-        'coach4@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'coach4@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "Emily Davis"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''
@@ -199,7 +203,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         coach5_user_id, '00000000-0000-0000-0000-000000000000',
-        'coach5@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'coach5@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "David Wilson"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''
@@ -213,7 +217,7 @@ BEGIN
         email_change_token_new, email_change
     ) VALUES (
         couple1_user_id, '00000000-0000-0000-0000-000000000000',
-        'couple1@test.com', crypt('password123', gen_salt('bf')), NOW(),
+        'couple1@test.com', extensions.crypt('password123', extensions.gen_salt('bf')), NOW(),
         '{"provider": "email", "providers": ["email"]}',
         '{"name": "James & Lisa Smith"}', 'authenticated', 'authenticated',
         NOW(), NOW(), '', '', '', ''

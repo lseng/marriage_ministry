@@ -167,3 +167,74 @@ When all specs are complete:
 6. **AI Chat**: Couples can have conversations to complete assignments
 7. **Notifications**: All stakeholders stay informed via their preferred channels
 8. **Design**: UI matches Resonate brand guide
+
+---
+
+## Cloud Supabase Configuration
+
+### Project Details
+- **URL**: https://pyabluebkwcfphjkhytu.supabase.co
+- **Project ID**: pyabluebkwcfphjkhytu
+
+### Deployment Commands
+```bash
+# Link to cloud project (one-time setup)
+npx supabase link --project-ref pyabluebkwcfphjkhytu
+
+# Push migrations to cloud
+npx supabase db push
+
+# Reset and reseed cloud database
+npx supabase db reset --linked
+```
+
+### Important Notes for Seed Data
+When writing seed.sql for cloud Supabase:
+- Use `extensions.crypt()` and `extensions.gen_salt()` instead of `crypt()` and `gen_salt()`
+- Use `gen_random_uuid()` instead of `uuid_generate_v4()` in migrations
+- The pgcrypto extension is in the `extensions` schema on cloud
+
+---
+
+## Code Quality Requirements
+
+### NO HARDCODED DATA
+All data must come from the database. Never hardcode:
+- User lists, coach lists, couple lists
+- Metrics counts or statistics
+- Assignment data or statuses
+- Any IDs or entity references
+
+### Data Fetching Pattern
+All components must fetch data via:
+1. **Supabase client** - Direct queries using `supabase.from('table').select()`
+2. **Custom hooks** - e.g., `useDashboardMetrics()`, `useCouples()`, `useCoaches()`
+3. **React Query** - For caching and refetching
+
+### Example Hook Pattern
+```typescript
+export function useCouples() {
+  const [couples, setCouples] = useState<Couple[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCouples = async () => {
+      const { data, error } = await supabase
+        .from('couples')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error) setCouples(data ?? []);
+      setLoading(false);
+    };
+    fetchCouples();
+  }, []);
+
+  return { couples, loading };
+}
+```
+
+### Test Data
+- Test data lives in `supabase/seed.sql`
+- Run `npx supabase db reset` locally to reset and reseed
+- Run `npx supabase db reset --linked` to reset cloud database
