@@ -335,17 +335,26 @@ All Phase 1 requirements have been implemented:
 
 ### Low Priority
 
-#### L1: SMS Integration - Database Schema
-- [ ] Create SMS-related database tables
-  - Files: `supabase/migrations/YYYYMMDD_sms_tables.sql`, `types/database.ts`
+#### L1: SMS Integration - Database Schema ✅
+- [x] Create SMS-related database tables
+  - Files: `supabase/migrations/20250121000000_sms_integration.sql` (completed)
   - Spec: `specs/phase-5-sms-integration.md`
   - Work:
-    - Create `phone_mappings` table (id, phone, couple_id, verified, verification_code, verified_at)
-    - Create `sms_messages` table (id, direction, phone, body, status, twilio_sid, error_message, created_at)
-    - Create `sms_templates` table (id, name, body, variables, is_active)
-    - Create `sms_opt_outs` table (phone, opted_out_at, reason)
-    - RLS policies
-  - Validation: Migration applies cleanly
+    - ✅ Created `phone_mappings` table (id, phone_number, couple_id, spouse, is_verified, verification_code, verification_expires_at, verified_at, opted_out, opted_out_at)
+    - ✅ Created `sms_messages` table (id, external_id, direction, from_number, to_number, body, media_urls, status, couple_id, related_assignment_id, conversation_thread_id, error_code, error_message, segments, sent_at, delivered_at)
+    - ✅ Created `sms_templates` table (id, name, category, body, is_active)
+    - ✅ Created `sms_config` table (id, provider, phone_number, account_sid, webhook_url, webhook_secret, is_active, daily_limit, messages_sent_today, limit_reset_at)
+    - ✅ Added helper function `is_coach()` for RLS policies
+    - ✅ Implemented RLS policies for all tables (admin, coach, couple access)
+    - ✅ Created indexes for performance (couple_id, direction/status, created_at, phone_number)
+    - ✅ Added triggers for updated_at columns
+    - ✅ Inserted 9 default SMS templates (verification, assignment, reminder, system)
+  - Validation: ✅ All tests passing (404/404), lint passed (0 warnings), build passed
+  - Notes:
+    - Opted_out functionality is embedded in phone_mappings table, not a separate table
+    - SMS templates support {{variable}} interpolation syntax
+    - Service role can manage all SMS messages for Edge Function integration
+    - Daily message limits tracked in sms_config table with auto-reset functionality
 
 #### L2: SMS Integration - Twilio Webhook Edge Function
 - [ ] Handle inbound SMS from Twilio
@@ -505,12 +514,12 @@ npx supabase db reset
 
 ## Summary
 
-| Priority | Count | Focus Area |
-|----------|-------|------------|
-| High     | 6     | Service Layer Tests (coaches, couples, assignments, homework, invitations, profile) |
-| Medium   | 3     | Email Notifications + Scheduling |
-| Low      | 6     | SMS + LLM Integration |
-| **Total** | **15** | |
+| Priority | Completed | Total | Focus Area |
+|----------|-----------|-------|------------|
+| High     | 6         | 6     | ✅ Service Layer Tests (coaches, couples, assignments, homework, invitations, profile) |
+| Medium   | 3         | 3     | ✅ Email Notifications + Scheduling |
+| Low      | 1         | 6     | SMS + LLM Integration (1/6 complete) |
+| **Total** | **10**    | **15** | |
 
 **Recommended Execution Order:**
 
