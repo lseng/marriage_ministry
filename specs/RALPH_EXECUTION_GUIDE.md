@@ -4,6 +4,59 @@
 
 ---
 
+## Access Tiers & Role Requirements
+
+### Tier 1: Manager (Admin)
+> This is what Mike and Dee see/manage
+
+**Dashboard & Visibility:**
+- Quick view of how many Coaches, Counselors, and Couples there are
+- See how many couples are not yet assigned to a Coach/Counselor
+- See which Coaches/Counselors are available (capacity vs current load)
+- See the current progress of each couple
+
+**Management Capabilities:**
+- Assign Couples to a Coach/Counselor
+- Assign Counselors to Coaches (hierarchy support)
+- Add/update/delete Couple, Coach, and Counselor information
+- Invite users to join the application via web form
+- Create, update, delete homework assignments and materials
+
+**Notifications:**
+- Notified once a couple has completed their session (program completion)
+- Notified when a Coach/Counselor/Couple registers on the app
+
+---
+
+### Tier 2: Coaches/Counselors
+> Note: Counselors may be assigned to work under Coaches
+
+**Visibility (scoped to their assigned couples/counselors only):**
+- See their couples' information (Name, email, phone, photo)
+- See the current progress of their couples
+- See couples' answers once submitted
+
+**Capabilities:**
+- Assign homework to their couples
+- View and review homework submissions
+
+**Notifications:**
+- Notified when a couple has completed their homework
+
+---
+
+### Tier 3: Couples
+
+**Visibility:**
+- See their assigned Coach/Counselor information (Name, email, phone, photo)
+- See any assignments they must complete
+- See their own progress
+
+**Notifications:**
+- Notified when homework has been assigned to them
+
+---
+
 ## Resources
 
 - **Brand Guide**: `specs/resonate-brand-guide.pdf`
@@ -112,20 +165,42 @@
 
 ---
 
-## Key Database Tables to Create
+## Key Database Tables to Create/Update
 
 ```
+# New Role Support
+counselors           - Counselor records (similar to coaches)
+coach_counselors     - Many-to-many: Counselors assigned to Coaches
+
+# Existing tables to update
+coaches              - Add capacity/availability fields
+couples              - Support assignment to coach OR counselor
+profiles             - Add 'counselor' role option
+
+# SMS Integration
 invitations          - Track pending invites
 phone_mappings       - Verified phone numbers
 sms_messages         - SMS log
 sms_config           - Twilio settings
 sms_templates        - SMS message templates
+
+# LLM Integration
 conversation_threads - LLM conversation state
 conversation_messages- Individual messages
 llm_configs          - Per-category prompts
+
+# Notifications
 notification_templates- Email/SMS templates
 notification_queue   - Async notification processing
 notifications        - In-app notifications
+```
+
+### Role Hierarchy
+```
+Manager (admin)
+    └── Coaches
+         └── Counselors (optional, assigned to coaches)
+              └── Couples
 ```
 
 ---
@@ -159,14 +234,24 @@ APP_URL=https://marriage.resonatemovement.org
 
 When all specs are complete:
 
-1. **Auth**: Admin can invite coaches/couples, they can accept and login
-2. **Profiles**: All roles can view/edit appropriate profiles
-3. **Dashboard**: Metrics are clickable, navigation works
+1. **Auth**: Admin can invite coaches/counselors/couples, they can accept and login
+2. **Profiles**: All roles can view/edit appropriate profiles (scoped to their tier)
+3. **Dashboard**: Role-specific dashboards with appropriate metrics
+   - Manager: Full visibility of all coaches, counselors, couples, unassigned couples
+   - Coach/Counselor: Only their assigned couples and progress
+   - Couple: Only their own assignments and coach/counselor info
 4. **Assignments**: Full lifecycle from creation to review
-5. **SMS**: Couples can text responses to complete assignments
-6. **AI Chat**: Couples can have conversations to complete assignments
-7. **Notifications**: All stakeholders stay informed via their preferred channels
-8. **Design**: UI matches Resonate brand guide
+5. **Role Management**:
+   - Manager can assign couples to coaches/counselors
+   - Manager can assign counselors to coaches (hierarchy)
+   - Coaches/Counselors can only see their assigned couples
+6. **SMS**: Couples can text responses to complete assignments
+7. **AI Chat**: Couples can have conversations to complete assignments
+8. **Notifications**:
+   - Manager notified on: new registrations, couple program completions
+   - Coach/Counselor notified on: couple homework completions
+   - Couple notified on: new homework assignments
+9. **Design**: UI matches Resonate brand guide
 
 ---
 
