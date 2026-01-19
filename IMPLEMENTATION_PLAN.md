@@ -356,18 +356,32 @@ All Phase 1 requirements have been implemented:
     - Service role can manage all SMS messages for Edge Function integration
     - Daily message limits tracked in sms_config table with auto-reset functionality
 
-#### L2: SMS Integration - Twilio Webhook Edge Function
-- [ ] Handle inbound SMS from Twilio
-  - Files: `supabase/functions/twilio-webhook/index.ts` (new)
+#### L2: SMS Integration - Twilio Webhook Edge Function ✅
+- [x] Handle inbound SMS from Twilio
+  - Files: `supabase/functions/twilio-webhook/index.ts` (completed)
   - Spec: `specs/phase-5-sms-integration.md`
   - Work:
-    - Create Edge Function to receive Twilio webhooks
-    - Verify Twilio signature (X-Twilio-Signature header)
-    - Parse inbound messages
-    - Route to command handlers (HELP, STATUS, SUBMIT, DONE, PAUSE, STOP, START)
-    - Log messages to sms_messages table
-    - Return TwiML response
-  - Validation: Webhook receives and logs test messages
+    - ✅ Create Edge Function to receive Twilio webhooks
+    - ✅ Verify Twilio signature (X-Twilio-Signature header)
+    - ✅ Parse inbound FormData from Twilio
+    - ✅ Route to command handlers (HELP, STATUS, SUBMIT, DONE, PAUSE, STOP, START)
+    - ✅ Log all inbound messages to sms_messages table
+    - ✅ Return TwiML XML responses
+    - ✅ Handle unknown numbers and opted-out users
+    - ✅ Support media URLs (MMS attachments)
+    - ✅ Treat non-command messages as assignment responses if pending assignment exists
+  - Validation: ✅ Lint passed (0 warnings), Build passed, Tests passed (404/404)
+  - Notes:
+    - Edge Function expects POST requests from Twilio with FormData (not JSON)
+    - Signature verification uses HMAC SHA-1 with URL + sorted params
+    - Commands are case-insensitive (converted to uppercase)
+    - STOP/START commands manage opt-out status
+    - SUBMIT command creates homework_response with submission_method='sms'
+    - DONE command marks assignment complete without detailed response
+    - PAUSE command sets reminders_paused_until to 7 days from now
+    - Unknown numbers receive 'unknown_number' template response
+    - Requires TWILIO_AUTH_TOKEN environment variable
+    - Should be configured as webhook URL in Twilio console
 
 #### L3: SMS Integration - Phone Verification Component
 - [ ] Build phone verification UI
@@ -518,8 +532,8 @@ npx supabase db reset
 |----------|-----------|-------|------------|
 | High     | 6         | 6     | ✅ Service Layer Tests (coaches, couples, assignments, homework, invitations, profile) |
 | Medium   | 3         | 3     | ✅ Email Notifications + Scheduling |
-| Low      | 1         | 6     | SMS + LLM Integration (1/6 complete) |
-| **Total** | **10**    | **15** | |
+| Low      | 2         | 6     | SMS + LLM Integration (2/6 complete) |
+| **Total** | **11**    | **15** | |
 
 **Recommended Execution Order:**
 
