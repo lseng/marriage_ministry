@@ -129,7 +129,7 @@ describe('assignments service', () => {
         if (table === 'assignment_statuses') {
           return {
             select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockImplementation((field: string, value: unknown) => {
+              eq: vi.fn().mockImplementation((field: string, _value: unknown) => {
                 if (field === 'assignment_id') {
                   // Check if there's a second eq call (for status)
                   const hasStatusFilter = statusCallCount < 2;

@@ -14,7 +14,7 @@ The Marriage Ministry application has a **comprehensive foundation** with most c
 ```
 npm run lint    → 0 warnings (passing)
 npm run build   → Success (570 kB bundle)
-npm run test    → 232 tests passed (16 test files)
+npm run test    → 360 tests passed (20 test files)
 ```
 
 ### Fully Implemented ✓
@@ -87,7 +87,7 @@ npm run test    → 232 tests passed (16 test files)
 | **services/** | 16% | Only notifications.ts has tests |
 | **components/** | 41% | Auth, dashboard, profile components covered |
 
-**Unit Tests (19 test files, 314 tests):**
+**Unit Tests (20 test files, 360 tests):**
 - `components/auth/__tests__/LoginPage.test.tsx`
 - `contexts/__tests__/AuthContext.test.tsx`
 - `hooks/__tests__/useProfile.test.ts`
@@ -104,7 +104,8 @@ npm run test    → 232 tests passed (16 test files)
 - `services/__tests__/notifications.test.ts`
 - `services/__tests__/coaches.test.ts` (23 tests)
 - `services/__tests__/couples.test.ts` (32 tests)
-- `services/__tests__/assignments.test.ts` (NEW - 27 tests)
+- `services/__tests__/assignments.test.ts` (27 tests)
+- `services/__tests__/homework.test.ts` (NEW - 46 tests)
 - `types/forms.test.ts`
 - `lib/date.test.ts`
 - `lib/permissions.test.ts`
@@ -210,9 +211,9 @@ All Phase 1 requirements have been implemented:
     - Test error handling
   - Validation: ✅ All 27 tests passing, 314 total tests now
 
-#### H4: Add Service Layer Tests for homework.ts
-- [ ] Create unit tests for homework service
-  - Files: `services/__tests__/homework.test.ts` (new)
+#### H4: Add Service Layer Tests for homework.ts ✅
+- [x] Create unit tests for homework service
+  - Files: `services/__tests__/homework.test.ts` (completed)
   - Spec: AGENTS.md (target: 70%+ coverage)
   - Work:
     - Mock Supabase client responses
@@ -221,7 +222,7 @@ All Phase 1 requirements have been implemented:
     - Test saveDraft(), submitHomework()
     - Test reviewHomework(), getPendingReviews()
     - Test getCoupleAssignments(), startHomework()
-  - Validation: `npm run test:run` passes, coverage improves
+  - Validation: ✅ All 46 tests passing, 360 total tests now
 
 #### H5: Add Service Layer Tests for invitations.ts
 - [ ] Create unit tests for invitations service
