@@ -87,7 +87,7 @@ npm run test    → 232 tests passed (16 test files)
 | **services/** | 16% | Only notifications.ts has tests |
 | **components/** | 41% | Auth, dashboard, profile components covered |
 
-**Unit Tests (17 test files, 255 tests):**
+**Unit Tests (18 test files, 287 tests):**
 - `components/auth/__tests__/LoginPage.test.tsx`
 - `contexts/__tests__/AuthContext.test.tsx`
 - `hooks/__tests__/useProfile.test.ts`
@@ -102,7 +102,8 @@ npm run test    → 232 tests passed (16 test files)
 - `components/dashboard/__tests__/ViewAllLink.test.tsx`
 - `components/assignments/__tests__/AssignmentDetailModal.test.tsx`
 - `services/__tests__/notifications.test.ts`
-- `services/__tests__/coaches.test.ts` (NEW - 23 tests)
+- `services/__tests__/coaches.test.ts` (23 tests)
+- `services/__tests__/couples.test.ts` (NEW - 32 tests)
 - `types/forms.test.ts`
 - `lib/date.test.ts`
 - `lib/permissions.test.ts`
@@ -159,7 +160,7 @@ All Phase 1 requirements have been implemented:
 |---------|-----------|--------|
 | notifications.ts | ✅ notifications.test.ts | Complete (98.7% coverage) |
 | coaches.ts | ✅ coaches.test.ts | Complete (23 tests) |
-| couples.ts | ❌ couples.test.ts | Missing (0% coverage) |
+| couples.ts | ✅ couples.test.ts | Complete (32 tests) |
 | assignments.ts | ❌ assignments.test.ts | Missing (0% coverage) |
 | homework.ts | ❌ homework.test.ts | Missing (0% coverage) |
 | invitations.ts | ❌ invitations.test.ts | Missing (0% coverage) |
@@ -183,9 +184,9 @@ All Phase 1 requirements have been implemented:
     - Test error handling (not found, database errors)
   - Validation: ✅ All 23 tests passing, 255 total tests now
 
-#### H2: Add Service Layer Tests for couples.ts
-- [ ] Create unit tests for couples service
-  - Files: `services/__tests__/couples.test.ts` (new)
+#### H2: Add Service Layer Tests for couples.ts ✅
+- [x] Create unit tests for couples service
+  - Files: `services/__tests__/couples.test.ts` (completed)
   - Spec: AGENTS.md (target: 70%+ coverage)
   - Work:
     - Mock Supabase client responses
@@ -193,7 +194,7 @@ All Phase 1 requirements have been implemented:
     - Test createCouple(), updateCouple(), deleteCouple()
     - Test assignCoach(), getCoachOptions()
     - Test error handling and edge cases
-  - Validation: `npm run test:run` passes, coverage improves
+  - Validation: ✅ All 32 tests passing, 287 total tests now
 
 #### H3: Add Service Layer Tests for assignments.ts
 - [ ] Create unit tests for assignments service
