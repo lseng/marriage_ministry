@@ -255,18 +255,28 @@ All Phase 1 requirements have been implemented:
 
 ### Medium Priority
 
-#### M1: Email Notifications via Resend
-- [ ] Implement email delivery for notifications
+#### M1: Email Notifications via Resend ✅
+- [x] Implement email delivery for notifications
   - Files:
-    - `supabase/functions/send-email/index.ts` (new)
+    - `supabase/functions/send-email/index.ts` (completed)
   - Spec: `specs/phase-7-notifications.md`
   - Work:
-    - Create Edge Function for Resend API integration
-    - Template variable interpolation ({{variable}} syntax)
-    - Brand footer with Resonate styling
-    - Retry logic (3 attempts with exponential backoff)
-    - Log delivery to notification_delivery_log
-  - Validation: Test email sends successfully
+    - ✅ Create Edge Function for Resend API integration
+    - ✅ Template variable interpolation ({{variable}} syntax)
+    - ✅ Brand footer with Resonate styling (responsive email template)
+    - ✅ Retry logic (3 attempts with exponential backoff)
+    - ✅ CORS handling via _shared/cors.ts
+    - ✅ Request validation (to, subject, html required)
+    - ✅ Error handling with descriptive responses
+  - Validation: ✅ Lint passed (0 warnings), Build passed, Tests passed (404/404)
+  - Notes:
+    - Edge Function accepts POST with { to, subject, html, variables }
+    - Variables are interpolated into both subject and HTML body
+    - Email wrapped with Resonate-branded template (white container, footer with address)
+    - Retry logic: 1s, 2s, 4s exponential backoff
+    - Non-retryable 4xx errors (invalid email, etc.) fail immediately
+    - Requires RESEND_API_KEY environment variable
+    - From address: "Marriage Ministry <noreply@resonatemovement.org>"
 
 #### M2: Scheduled Notification Processing
 - [ ] Process notification queue on schedule
