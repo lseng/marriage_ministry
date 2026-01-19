@@ -4,48 +4,64 @@
 
 @layer base {
   :root {
+    /* === Resonate Brand Colors === */
+    /* Primary: Resonate Blue #41748d (HSL: 197 37% 40%) */
+    /* Secondary/Success: Resonate Green #50a684 (HSL: 155 36% 48%) */
+
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 40 4% 22%; /* Resonate dark gray #373a36 */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 40 4% 22%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --popover-foreground: 40 4% 22%;
+    --primary: 197 37% 40%; /* Resonate Blue #41748d */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 155 36% 48%; /* Resonate Green #50a684 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 0 0% 33%; /* Resonate light gray #545454 */
+    --accent: 197 37% 96%; /* Light blue accent */
+    --accent-foreground: 197 37% 40%;
+    --destructive: 0 65% 51%; /* Error red #c45c5c */
+    --destructive-foreground: 0 0% 100%;
+    --success: 155 36% 48%; /* Resonate Green #50a684 */
+    --success-foreground: 0 0% 100%;
+    --warning: 30 48% 64%; /* Warning amber #d4a574 */
+    --warning-foreground: 40 4% 22%;
+    --info: 197 37% 40%; /* Resonate Blue */
+    --info-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 197 37% 40%; /* Resonate Blue for focus ring */
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 40 4% 10%;
+    --foreground: 0 0% 96%;
+    --card: 40 4% 12%;
+    --card-foreground: 0 0% 96%;
+    --popover: 40 4% 12%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 197 42% 50%; /* Lighter blue for dark mode */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 155 40% 55%; /* Lighter green for dark mode */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 40 4% 18%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 197 30% 20%;
+    --accent-foreground: 197 42% 70%;
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 155 40% 55%;
+    --success-foreground: 0 0% 100%;
+    --warning: 30 48% 55%;
+    --warning-foreground: 0 0% 100%;
+    --info: 197 42% 50%;
+    --info-foreground: 0 0% 100%;
+    --border: 40 4% 25%;
+    --input: 40 4% 25%;
+    --ring: 197 42% 50%;
   }
 }
 
